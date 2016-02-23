@@ -45,7 +45,6 @@ int main(int argc, char **argv) {
   MPI_Comm_size (MPI_COMM_WORLD, &total);
   MPI_Comm_rank (MPI_COMM_WORLD, &myrank);
 
-
   assert(N%total==0);
   FILE * gpipe;
   if(!myrank) {
@@ -82,13 +81,15 @@ int main(int argc, char **argv) {
   f= myrank ? myrank*N/total-1 : 0;
   printf("Total=%d, rank=%d line %d\n",total,myrank,f);
   // Инициализация матрицы A
-  for (i=0; i<n; i++) {
+  for (i= 0; i<n; i++) {
     if(i + f == 0)
       for (j=0; j<N; j++)
+        // Граничное условие первого рода для левой границы
         A[j] = 150;
     else if(i + f == N - 1)
       for(j = 0; j < N; j++)
-        A[i*N+j]=100;
+        // Граничное условие первого рода для правой границы
+        A[i * N + j]=100;
     else
       for(j = 0; j < N; j++)
         A[i*N+j]=-10;
