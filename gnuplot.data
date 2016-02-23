@@ -1,0 +1,5 @@
+set view 0,0
+set pm3d at b
+set palette rgbformulae 30,31,32
+set dgrid3d 100,100
+unset key
