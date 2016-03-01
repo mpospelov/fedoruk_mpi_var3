@@ -20,24 +20,24 @@ int main(int argc, char **argv) {
   assert(argc==3);
 
   int N = atoi(argv[1]);
- 
+
   int Tmax =  atoi(argv[2]);
- 
+
   float_t *A;  //plate matrix
-  float_t *Out; //just for root 
+  float_t *Out; //just for root
   int n;    // Ширина ленты матрицы
     // Номер первой строки для вычисления
- 
+
   int myrank, total;
   struct timeval startTime,endTime;
-  
+
   gettimeofday(&startTime,NULL);
-  
+
   MPI_Init (&argc, &argv);
   MPI_Comm_size (MPI_COMM_WORLD, &total);
   MPI_Comm_rank (MPI_COMM_WORLD, &myrank);
 
- 
+
   assert(N%total==0);
   FILE * gpipe;
   if(!myrank)
@@ -74,22 +74,22 @@ int main(int argc, char **argv) {
   f= myrank ? myrank*N/total-1 : 0;
   printf("Total=%d, rank=%d line %d\n",total,myrank,f);
     // Инициализация матрицы A
-    for (i=0; i<n; i++) 
+    for (i=0; i<n; i++)
       {
 	if(i+f==0)
 	  for (j=0; j<N; j++)
 	      A[j] = 150;
-         
+
 	else if(i+f==N-1)
 	  for(j=0;j<N;j++)
 	    A[i*N+j]=100;
 
-	else 
+	else
 	  for(j=0;j<N;j++)
 	  A[i*N+j]=-10;
       }
-    
-   
+
+
     for(i=0;i<n;i++){
       A[i*N]=-30;
       A[(i+1)*N-1]=-30;
@@ -102,23 +102,23 @@ int main(int argc, char **argv) {
     float_t lambda= 45;
     float_t C_t =460;
     float_t p=7800;
-    float_t a_t=lambda/(C_t*p); 
+    float_t a_t=lambda/(C_t*p);
 
     //method variables control panel
     float_t t=0; //start/end time
-    float_t dx =width/N; 
-    float_t dy = height/N; 
+    float_t dx =width/N;
+    float_t dy = height/N;
     float_t dt=0.5*dy*dy/(2*a_t); //step in time
     dt=dt>0.2?0.2:dt;
     float_t dTout=2,Tout=1; // visualization result period
-   
+
     float_t w_x=dt*a_t/(dx*dx);
     float_t w_y=dt*a_t/(dy*dy);
     //index of finete difference elements u-up, r-right etc.
     int u,d,l,r;
-   
+
     // printf("%f %f %f %f %f %f %f %d %d\n\n",a_t,dx,dy,dt,dTout,w_x,w_y,n,N);
-    
+
 
     while(t<Tmax)
     {
@@ -128,8 +128,8 @@ int main(int argc, char **argv) {
 	  for (i=1; i<n-1; i++)
 	    for (j=1,k=i*N+j,l=k-1,r=k+1,u=k+N,d=k-N; j<N-1; j++,k++,l++,r++,u++,d++)
 	      A[k]+=w_x*(A[r]-2*A[k]+A[l])+w_y*(A[u]-2*A[k]+A[d]);
-    
-    
+
+
 
 	  //dT itaration synchronization
 	  MPI_Status *status=(MPI_Status *)malloc(sizeof(MPI_Status));
@@ -144,7 +144,7 @@ int main(int argc, char **argv) {
 	      if(myrank!=total-1)
 		MPI_Recv(&(A[(n-1)*N]),N,floatMPI,myrank+1,0,MPI_COMM_WORLD,status);
 	    }
-	  else 
+	  else
 	    {
 	      if(myrank)
 		MPI_Recv(A,N,floatMPI,myrank-1,0,MPI_COMM_WORLD,status);
@@ -197,11 +197,11 @@ int i,j;
       for(i=0;i<N;i++)
 	{
 	  for(j=0;j<N;j++)
-	    fprintf(gnuplot,"%d %d %f\n",i,j,Out[i*N+j]);
+	    fprintf(gnuplot,"%d %d %f\n", i, j, Out[i * M+j]);
 	}
       fprintf(gnuplot,"e\n");
       fprintf(gnuplot,"pause -1\n");
-      fflush(gnuplot); 
+      fflush(gnuplot);
     }
   if(0){
     for(i=0;i<N;i++){
