@@ -209,14 +209,14 @@ int main(int argc, char **argv) {
       if(!myrank)
         plotresult(A,Out, myrank, total, gpipe);
       else
-        plotresult(&(A[N]), Out, myrank, total, gpipe);
+        plotresult(&(A[M]), Out, myrank, total, gpipe);
     #endif //Output
   }
   #ifdef GNUPLOT_ONE
     if(!myrank)
       plotresult(A,Out, myrank, total, gpipe);
     else
-      plotresult(&(A[N]), Out, myrank, total, gpipe);
+      plotresult(&(A[M]), Out, myrank, total, gpipe);
   #endif
   MPI_Finalize();
   if(!myrank){
